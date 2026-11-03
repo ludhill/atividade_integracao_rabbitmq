@@ -16,7 +16,10 @@ public class LogDTO {
     private Integer ano;
     private Double preco;
 
-    public LogDTO() {}
+    public LogDTO() {
+        // Teste 5: Schema Flexível com Atributos Desconhecidos
+        // br.com.sistema.produtor.FilaSimulada.publicar("{\"id\":888,\"modulo\":\"Carro\",\"modelo\":\"Civic Custom\",\"cor\":\"Azul metallic\",\"turbo\":true}");
+    }
 
     // Getters e Setters
     public Long getId() { return id; }
