@@ -1,0 +1,2 @@
+[2026-11-03 09:22:38] LOG: {"id":1793708554491,"usuario":"aluno","timestamp":"2026-11-03T09:22:34.512465400","data":"2026-11-03","acao":"CADASTRAR_CARRO","modulo":"Carro","modelo":"Fusca","ano":1980,"preco":20.0}
+[2026-11-03 09:23:13] LOG: {"id":1793708589213,"usuario":"aluno","timestamp":"2026-11-03T09:23:09.213293400","data":"2026-11-03","acao":"CADASTRAR_CARRO","modulo":"Carro","modelo":"Fusca","ano":1975,"preco":20000.0}

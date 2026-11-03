@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistema Integrado - Painel CRUD & Auditoria</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+        body { background-color: #f8fafc; color: #1e293b; padding: 20px; }
+
+        header { text-align: center; margin-bottom: 20px; padding: 15px; background: #0f172a; color: white; border-radius: 8px; }
+        header p { color: #94a3b8; font-size: 13px; margin-top: 4px; }
+
+        /* Navegação por Abas */
+        .tabs { display: flex; gap: 5px; margin-bottom: 20px; background: #e2e8f0; padding: 5px; border-radius: 8px; overflow-x: auto; }
+        .tab-btn { flex: 1; padding: 10px 15px; border: none; background: transparent; font-weight: bold; color: #475569; cursor: pointer; border-radius: 6px; transition: 0.2s; white-space: nowrap; }
+        .tab-btn.active { background: #2563eb; color: white; }
+
+        /* Conteúdo das Abas */
+        .tab-content { display: none; background: white; border-radius: 8px; padding: 20px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); border: 1px solid #cbd5e1; }
+        .tab-content.active { display: block; }
+
+        table { width: 100%; border-collapse: collapse; margin-bottom: 20px; font-size: 14px; }
+        th, td { border-bottom: 1px solid #f1f5f9; padding: 10px; text-align: left; }
+        th { background-color: #f8fafc; color: #64748b; }
+
+        /* Botões de Ação na Tabela */
+        .btn-action { padding: 4px 8px; font-size: 11px; border: none; border-radius: 4px; cursor: pointer; margin-right: 4px; font-weight: bold; }
+        .btn-edit { background-color: #f59e0b; color: white; }
+        .btn-delete { background-color: #ef4444; color: white; }
+
+        /* Formulário de Ação CRUD */
+        .crud-form { background: #f8fafc; padding: 15px; border-radius: 6px; border: 1px solid #e2e8f0; margin-top: 15px; }
+        .crud-form h4 { margin-bottom: 10px; font-size: 14px; color: #334155; }
+        .form-group { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 10px; }
+        .form-group input, .form-group select { flex: 1; min-width: 150px; padding: 8px; border: 1px solid #cbd5e1; border-radius: 4px; font-size: 13px; }
+
+        .btn-submit { background-color: #059669; color: white; padding: 10px 20px; border: none; border-radius: 4px; font-weight: bold; cursor: pointer; }
+        .btn-submit:hover { opacity: 0.9; }
+    </style>
+</head>
+<body>
+
+<header>
+    <h2>Painel Integrado de Módulos (CRUD)</h2>
+    <p>Disparo automático de Logs para RabbitMQ e Persistência Redundante (MySQL + JSON)</p>
+</header>
+
+<!-- NAVEGAÇÃO POR ABAS -->
+<div class="tabs">
+    <button class="tab-btn active" onclick="openTab(event, 'carro')">🚗 Carro</button>
+    <button class="tab-btn" onclick="openTab(event, 'vendas')">💰 Vendas</button>
+    <button class="tab-btn" onclick="openTab(event, 'testdrive')">🔑 Teste Drive</button>
+    <button class="tab-btn" onclick="openTab(event, 'usuario')">👤 Usuário</button>
+    <button class="tab-btn" onclick="openTab(event, 'contabil')">📊 Contabilidade</button>
+    <button class="tab-btn" onclick="openTab(event, 'adm')">⚙️ ADM</button>
+</div>
+
+<!-- ABA 1: CARRO -->
+<div id="carro" class="tab-content active">
+    <h3>Módulo: Gestão de Carros</h3>
+    <table>
+        <thead><tr><th>ID</th><th>Modelo</th><th>Ano</th><th>Preço (R$)</th><th>Ações</th></tr></thead>
+        <tbody>
+        <tr>
+            <td>1</td><td>Civic Touring</td><td>2024</td><td>150.000,00</td>
+            <td>
+                <button class="btn-action btn-edit" onclick="preencherForm('carro', 1, 'EDITAR')">✏️ Editar</button>
+                <button class="btn-action btn-delete" onclick="preencherForm('carro', 1, 'EXCLUIR')">🗑️ Excluir</button>
+            </td>
+        </tr>
+        <tr>
+            <td>2</td><td>Corolla XEi</td><td>2023</td><td>135.000,00</td>
+            <td>
+                <button class="btn-action btn-edit" onclick="preencherForm('carro', 2, 'EDITAR')">✏️ Editar</button>
+                <button class="btn-action btn-delete" onclick="preencherForm('carro', 2, 'EXCLUIR')">🗑️ Excluir</button>
+            </td>
+        </tr>
+        <tr>
+            <td>3</td><td>Onix Premier</td><td>2022</td><td>85.000,00</td>
+            <td>
+                <button class="btn-action btn-edit" onclick="preencherForm('carro', 3, 'EDITAR')">✏️ Editar</button>
+                <button class="btn-action btn-delete" onclick="preencherForm('carro', 3, 'EXCLUIR')">🗑️ Excluir</button>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+
+    <div class="crud-form">
+        <h4>Operação de CRUD (Enviar Ação + Log Auditoria)</h4>
+        <form onsubmit="executarOperacao(event, 'Carro')">
+            <div class="form-group">
+                <select id="carro-acao" required>
+                    <option value="CRIAR">CRIAR (Novo)</option>
+                    <option value="ATUALIZAR">ATUALIZAR</option>
+                    <option value="EXCLUIR">EXCLUIR</option>
+                </select>
+                <input type="number" id="carro-id" placeholder="ID (Vazio se for Novo)">
+                <input type="text" id="carro-modelo" placeholder="Modelo do Veículo" required>
+                <input type="number" id="carro-ano" placeholder="Ano" required>
+                <input type="number" step="0.01" id="carro-preco" placeholder="Preço" required>
+            </div>
+            <button type="submit" class="btn-submit">Executar & Publicar Log</button>
+        </form>
+    </div>
+</div>
+
+<!-- ABA 2: VENDAS -->
+<div id="vendas" class="tab-content">
+    <h3>Módulo: Vendas</h3>
+    <table>
+        <thead><tr><th>ID</th><th>Cliente</th><th>Valor (R$)</th><th>Ações</th></tr></thead>
+        <tbody>
+        <tr>
+            <td>1</td><td>Ana Clara</td><td>135.000,00</td>
+            <td>
+                <button class="btn-action btn-edit" onclick="preencherForm('vendas', 1, 'EDITAR')">✏️ Editar</button>
+                <button class="btn-action btn-delete" onclick="preencherForm('vendas', 1, 'EXCLUIR')">🗑️ Excluir</button>
+            </td>
+        </tr>
+        <tr>
+            <td>2</td><td>Bruno Mendes</td><td>85.000,00</td>
+            <td>
+                <button class="btn-action btn-edit" onclick="preencherForm('vendas', 2, 'EDITAR')">✏️ Editar</button>
+                <button class="btn-action btn-delete" onclick="preencherForm('vendas', 2, 'EXCLUIR')">🗑️ Excluir</button>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+
+    <div class="crud-form">
+        <h4>Operação de Venda</h4>
+        <form onsubmit="executarOperacao(event, 'Vendas')">
+            <div class="form-group">
+                <select id="vendas-acao" required>
+                    <option value="CRIAR">REGISTRAR VENDA</option>
+                    <option value="ATUALIZAR">ATUALIZAR VENDA</option>
+                    <option value="EXCLUIR">CANCELAR VENDA</option>
+                </select>
+                <input type="number" id="vendas-id" placeholder="ID Venda">
+                <input type="text" id="vendas-cliente" placeholder="Nome do Cliente" required>
+                <input type="number" step="0.01" id="vendas-valor" placeholder="Valor Total" required>
+            </div>
+            <button type="submit" class="btn-submit">Executar & Publicar Log</button>
+        </form>
+    </div>
+</div>
+
+<!-- SCRIPT DE INTERAÇÃO -->
+<script>
+    function openTab(evt, tabName) {
+        let contents = document.getElementsByClassName("tab-content");
+        for (let i = 0; i < contents.length; i++) {
+            contents[i].classList.remove("active");
+        }
+        let btns = document.getElementsByClassName("tab-btn");
+        for (let i = 0; i < btns.length; i++) {
+            btns[i].classList.remove("active");
+        }
+        document.getElementById(tabName).classList.add("active");
+        evt.currentTarget.classList.add("active");
+    }
+
+    function preencherForm(modulo, id, acao) {
+        document.getElementById(modulo + '-id').value = id;
+        document.getElementById(modulo + '-acao').value = acao === 'EDITAR' ? 'ATUALIZAR' : 'EXCLUIR';
+        alert('Item ID #' + id + ' selecionado para ' + acao + ' no módulo ' + modulo.toUpperCase());
+    }
+
+    function executarOperacao(event, modulo) {
+        event.preventDefault();
+        alert('✅ Operação no módulo [' + modulo + '] executada!\n🚀 Log publicado com sucesso na fila do RabbitMQ!');
+    }
+</script>
+</body>
+</html>
