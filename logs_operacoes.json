@@ -448,3 +448,8 @@
 [2026-11-03 10:17:48] LOG: {"id":888,"modulo":"Carro","modelo":"Civic Custom","cor":"Azul metallic","turbo":true}
 [2026-11-03 10:17:48] LOG: {"id":888,"modulo":"Carro","modelo":"Civic Custom","cor":"Azul metallic","turbo":true}
 [2026-11-03 10:20:53] LOG: {"id":1793712048432,"usuario":"Aluno","timestamp":"2026-11-03T10:20:49.088984600","data":"2026-11-03","acao":"CADASTRAR_CARRO","modulo":"Carro","modelo":"Maverick 1978 85000","ano":1978,"preco":85000.0}
+[2026-11-04 11:13:16] LOG: {"id":1793801591062,"usuario":"Lucas_denner","timestamp":"2026-11-04T11:13:11.723308700","data":"2026-11-04","acao":"CADASTRAR_CARRO","modulo":"Carro","modelo":"Uno","ano":1995,"preco":30000.0}
+[2026-11-04 11:50:51] LOG: true
+[2026-11-04 11:52:13] LOG: {"id":1793803932641,"usuario":"lucas denner","timestamp":"2026-11-04T11:52:13.186558500","data":"2026-11-04","acao":"CADASTRAR_CARRO","modulo":"Carro","modelo":"BMW","ano":2010,"preco":150000.0}
+[2026-11-04 11:55:06] LOG: {"id":1793804106409,"usuario":"lucas denner","timestamp":"2026-11-04T11:55:06.436984500","data":"2026-11-04","acao":"FINALIZAR_VENDA: Joao","modulo":"Vendas","modelo":null,"ano":null,"preco":10000.0}
+[2026-11-04 11:55:30] LOG: {"id":1793804129846,"usuario":"lucas denner","timestamp":"2026-11-04T11:55:29.865097400","data":"2026-11-04","acao":"AGENDAR_TESTE_DRIVE: BMW","modulo":"TesteDrive","modelo":"BMW","ano":null,"preco":null}

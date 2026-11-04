@@ -7,7 +7,7 @@ import java.util.Scanner;
 public class MainAplicacao {
 
     public static void main(String[] args) {
-        // Inicia o consumidor em segundo plano na mesma JVM
+
         new Thread(() -> ReceberLog.main(new String[]{})).start();
         try { Thread.sleep(1000); } catch (InterruptedException ignored) {}
 
@@ -21,8 +21,7 @@ public class MainAplicacao {
         String perfil = scanner.nextLine().trim();
 
         int opcao = -1;
-        //Teste de Prevenção de Valoração NULL no Consumidor
-        //br.com.sistema.produtor.FilaSimulada.publicar("{\"id\":777,\"modulo\":\"Carro\",\"modelo\":\"Fusca Sem Data\",\"preco\":12000.0}");
+
         while (opcao != 0) {
             System.out.println("\n=== SISTEMA DE CONCESSIONÁRIA INTEGRADO ===");
             System.out.println("Usuário: " + usuario + " | Perfil: " + perfil);
@@ -56,7 +55,7 @@ public class MainAplicacao {
 
                 case 2:
                     if ("ADM".equalsIgnoreCase(perfil)) {
-                        System.out.println("❌ Acesso Negado: Perfil ADM não possui permissão para registrar vendas.");
+                        System.out.println("Acesso Negado: Perfil ADM não possui permissão para registrar vendas.");
                         break;
                     }
                     System.out.print("Nome do Cliente: ");
@@ -78,7 +77,7 @@ public class MainAplicacao {
 
                 case 4:
                     if (!"Dono".equalsIgnoreCase(perfil)) {
-                        System.out.println("❌ Acesso Negado: Apenas o perfil 'Dono' pode realizar lançamentos contábeis.");
+                        System.out.println("Acesso Negado: Apenas o perfil 'Dono' pode realizar lançamentos contábeis.");
                         break;
                     }
                     System.out.print("Descrição do Lançamento: ");
@@ -91,7 +90,7 @@ public class MainAplicacao {
 
                 case 5:
                     if ("Vendedor".equalsIgnoreCase(perfil)) {
-                        System.out.println("❌ Acesso Negado: Vendedores não têm permissão para criar usuários.");
+                        System.out.println("Acesso Negado: Vendedores não têm permissão para criar usuários.");
                         break;
                     }
                     System.out.print("Nome do Novo Usuário: ");
@@ -105,9 +104,8 @@ public class MainAplicacao {
                     break;
 
                 case 6:
-                    // VALIDAÇÃO PRÉVIA: Checa permissão ANTES de fazer perguntas no scanner
                     if (!"Dono".equalsIgnoreCase(perfil) && !"ADM".equalsIgnoreCase(perfil)) {
-                        System.out.println("❌ Acesso Negado: Apenas perfil Dono/ADM pode alterar parâmetros de sistema.");
+                        System.out.println("Acesso Negado: Apenas perfil Dono/ADM pode alterar parâmetros de sistema.");
                         break;
                     }
 

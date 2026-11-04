@@ -10,9 +10,11 @@ import java.nio.charset.StandardCharsets;
 
 public class EnviarLog {
 
-    private static final String RABBIT_HOST = "56.125.4.XXX"; // Host do laboratório
-    private static final String FILA_LOGS = "dupla_maria_lucas";
+    private static final String RABBIT_HOST = "15.228.215.36"; // Host do laboratório
+    private static final String FILA_LOGS = "lucas_denner";
     private static final ObjectMapper mapper = new ObjectMapper();
+
+    private static final boolean USAR_CONTINGENCIA = false;
 
     public static void dispararLog(LogDTO dto) {
         try {
@@ -23,7 +25,7 @@ public class EnviarLog {
             factory.setPort(5672);
             factory.setUsername("aluno");
             factory.setPassword("12345");
-            factory.setConnectionTimeout(2000); // Timeout rápido para não travar a aplicação
+            factory.setConnectionTimeout(10000);
 
             try (Connection connection = factory.newConnection();
                  Channel channel = connection.createChannel()) {
@@ -33,9 +35,12 @@ public class EnviarLog {
                 System.out.println(">>> [RABBITMQ ONLINE] Log enviado com sucesso.");
 
             } catch (Exception e) {
-                // SE O RABBITMQ ESTIVER OFFLINE, UTILIZA A FILA EM MEMÓRIA
-                System.out.println("⚠️ [RABBITMQ INDISPONÍVEL] Redirecionando log para a Fila Simulada...");
-                FilaSimulada.publicar(jsonMessage);
+                if (USAR_CONTINGENCIA) {
+                    System.out.println("[RABBITMQ INDISPONÍVEL] Redirecionando log para a Fila Simulada...");
+                    FilaSimulada.publicar(jsonMessage);
+                } else {
+                    System.err.println("[RABBITMQ OFFLINE] Log NÃO enviado (Contingência desativada). Motivo: " + e.getMessage());
+                }
             }
 
         } catch (Exception e) {

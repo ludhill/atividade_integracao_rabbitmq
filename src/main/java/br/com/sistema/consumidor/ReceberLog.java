@@ -16,14 +16,12 @@ import java.time.format.DateTimeFormatter;
 
 public class ReceberLog {
 
-    // Configurações do RabbitMQ (Ajuste o IP e credenciais do seu ambiente)
-    private static final String RABBIT_HOST = "56.125.4.XXX";
+    private static final String RABBIT_HOST = "15.228.215.36";
     private static final int RABBIT_PORT = 5672;
     private static final String RABBIT_USER = "aluno";
     private static final String RABBIT_PASS = "12345";
-    private static final String FILA_LOGS = "dupla_maria_lucas";
+    private static final String FILA_LOGS = "lucas_denner";
 
-    // Configurações de Redundância (Disco e Banco)
     private static final String ARQUIVO_LOG = "logs_operacoes.json";
     private static final String MYSQL_URL = "jdbc:mysql://localhost:3306/db_logs_auditoria?useSSL=false&serverTimezone=UTC";
     private static final String MYSQL_USER = "root";
@@ -33,8 +31,8 @@ public class ReceberLog {
 
     public static void main(String[] args) {
         System.out.println(">>> [MÓDULO DE LOGS ATIVO] Iniciando serviço de recepção...");
+/* TEMPORARIAMENTE DESABILITADO: Worker de contingência local
 
-        // 1. WORKER DE CONTINGÊNCIA: Escuta a FilaSimulada (memória) caso o RabbitMQ caia
         new Thread(() -> {
             while (true) {
                 try {
@@ -49,8 +47,8 @@ public class ReceberLog {
                 }
             }
         }, "Worker-FilaSimulada").start();
-
-        // 2. CONSUMIDOR NATIVO RABBITMQ
+*/
+        // CONSUMIDOR NATIVO RABBITMQ
         iniciarConsumidorRabbitMQ();
     }
 
@@ -78,17 +76,17 @@ public class ReceberLog {
             channel.basicConsume(FILA_LOGS, true, deliverCallback, consumerTag -> {});
 
         } catch (Exception e) {
-            System.err.println("⚠️ [RABBITMQ INDISPONÍVEL] O módulo operará em contingência local (Fila Simulada).");
+            //System.err.println("[RABBITMQ INDISPONÍVEL] O módulo operará em contingência local (Fila Simulada).");
+            System.err.println("[RABBITMQ INDISPONÍVEL] ");;
             System.err.println("   Motivo: " + e.getMessage());
         }
     }
 
-    // Método único para garantir a dupla persistência
+
     public static void processarEPersistir(String jsonRecebido) {
-        // Redundância 1: Salva no arquivo local (.json)
+
         salvarEmArquivo(jsonRecebido);
 
-        // Converte para DTO
         LogDTO dto = null;
         try {
             dto = mapper.readValue(jsonRecebido, LogDTO.class);
@@ -96,7 +94,7 @@ public class ReceberLog {
             System.err.println(">>> Falha no parse do DTO (o payload bruto será salvo mesmo assim): " + e.getMessage());
         }
 
-        // Redundância 2: Salva no MySQL
+        // Redundância
         salvarNoMySQL(jsonRecebido, dto);
     }
 
@@ -121,30 +119,30 @@ public class ReceberLog {
         try (java.sql.Connection conn = java.sql.DriverManager.getConnection(MYSQL_URL, MYSQL_USER, MYSQL_PASS);
              java.sql.PreparedStatement stmt = conn.prepareStatement(sql)) {
 
-            // 1. ID de Origem
+            // ID de Origem
             if (dto != null && dto.getId() != null) {
                 stmt.setLong(1, dto.getId());
             } else {
                 stmt.setNull(1, java.sql.Types.BIGINT);
             }
 
-            // 2. Usuário (Fallback para valor genérico)
+
             String usuario = (dto != null && dto.getUsuario() != null) ? dto.getUsuario() : "Sistema Central";
             stmt.setString(2, usuario);
 
-            // 3. Timestamp (Gera data/hora atual se não for informado)
+
             String timestamp = (dto != null && dto.getTimestamp() != null)
                     ? dto.getTimestamp()
                     : LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss"));
             stmt.setString(3, timestamp);
 
-            // 4. Data (Gera data atual YYYY-MM-DD se não for informada)
+
             String data = (dto != null && dto.getData() != null)
                     ? dto.getData()
                     : LocalDate.now().toString();
             stmt.setString(4, data);
 
-            // 5. Ação
+
             String acao;
             if (dto != null && dto.getAcao() != null) {
                 acao = dto.getAcao();
@@ -155,7 +153,6 @@ public class ReceberLog {
             }
             stmt.setString(5, acao);
 
-            // 6. Payload JSON completo
             stmt.setString(6, json);
 
             stmt.executeUpdate();
